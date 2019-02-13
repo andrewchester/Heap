@@ -1,8 +1,8 @@
 #include <iostream>
 #include <cstdlib>
+#include <string.h>
 #include <fstream>
 #include "list.h"
-
 
 void from_file(LinkedList* input, const char* path){
 	std::ifstream file(path);
@@ -10,14 +10,14 @@ void from_file(LinkedList* input, const char* path){
 	char token[100];
 	for(int i = 0; i < sizeof(token); i++) token[i] = 0;
 	int position = 0;
-	while(file >> c) {
-		if(c != ' '){
+	while(file.get(c)){
+		if(c == ' '){
+			input->append(atoi(token));
+			position = 0;
+			for(int i = 0; i < sizeof(token); i++) token[i] = 0;
+		}else {
 			token[position] = c;
 			position++;
-		}else{
-			input->append(std::atoi(token));
-			for(int i = 0; i < sizeof(token); i++) token[i] = 0;
-			position = 0;
 		}
 	}
 }
