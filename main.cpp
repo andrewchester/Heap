@@ -2,9 +2,9 @@
 #include <cstdlib>
 #include <string.h>
 #include <fstream>
-#include "list.h"
+#include "heap.h"
 
-void from_file(LinkedList* input, const char* path){
+void from_file(Heap* heap, const char* path){
 	std::ifstream file(path);
 	char c;
 	char token[100];
@@ -12,7 +12,7 @@ void from_file(LinkedList* input, const char* path){
 	int position = 0;
 	while(file.get(c)){
 		if(c == ' '){
-			input->append(atoi(token));
+			heap->insert(atoi(token));
 			position = 0;
 			for(int i = 0; i < sizeof(token); i++) token[i] = 0;
 		}else {
@@ -23,8 +23,8 @@ void from_file(LinkedList* input, const char* path){
 }
 
 int main(){
-	LinkedList* input = new LinkedList();
-	from_file(input, "./input.txt");
-	std::cout << *input << std::endl;
+	Heap heap = Heap();
+	from_file(&heap, "./input.txt");
+	std::cout << heap << std::endl;
 	return 0;
 }
