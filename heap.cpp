@@ -3,36 +3,16 @@
 
 Heap::Heap(){
 	//Initialize the root as a null pointer and set the number of nodes to 0
-	root = nullptr;
+	root = 0;
 	num_nodes = 0;
 }
 
-
-/* 
-	This function prints the node, and all of its children recursively in a structure that mimics the heap when printed
-	Parameters:
-		root - The node we're operating on
-		pre_spaces - The number of spaces to put before the node's data. This is only passed to nodes on the leftmost side of the tree. All right nodes get a 0 for this variable, including all their children
-		new_line - A boolean value determining whether or not to indent. This is passed only to rightside nodes, all leftside nodes, and their children, will have a false for this value.
-		depth - tracks the depth from the current node. This is used to determine the number of spaces we need to put inbetween each output to keep the tree lookin prestine.
-
-	Sample Output(hopefully):
-					  100
-				    90   80
-				  70 70 70 70	
-*/
-void Heap::print(Node* root, int pre_spaces, bool new_line, int depth){
-	for(int i = 0; i < pre_spaces; i++) //Inserts spaces before a node, if the node isn't a leftmost node, pre_spaces will be 0
-		std::cout << " ";
-	std::cout << root->data; //Output the value of the node we're on
-	for(int i = 0; i < depth; i++) //Output spaces on the end of the node's value depending on how deep the rest of the tree is, so the nodes at the bottom will be close together and the top will be farther apart
-		std::cout << " ";
-	if(new_line) //Indent if we're at the end of of a branch??????(what do you call the right edge of a tree???)
-		std::cout << std::endl;
-	if(root->left) //Go print out the left side if it exists
-		print(root->left, --pre_spaces, false, --depth); //deincrement the number of spaces to put in the front and the depth. Pass false for new_line since we're going left, this false will be passed to all their children
-	if(root->right)
-		print(root->right, 0, new_line, --depth); //Same deal over here, but passing whatever we got as new_line from the node above and setting 0 for pre_spaces
+void Heap::print(Node* root){
+	if(root == 0)
+		return;
+	std::cout << root->data << " ";
+	print(root->left);
+	print(root->right);
 }
 
 
@@ -45,9 +25,79 @@ std::ostream& operator<<(std::ostream& os, Heap& heap){
 		depth++; //Increases the depth each time we go down
 	}
 	//When the above loop finishes, we'll have the width of the base of the tree and the total depth
-	
-	heap.print(heap.root, width / 2, true, depth); //Pass the top of the tree, the width of the 
+	heap.print(heap.root); //Pass the top of the tree, the width of the 
 }
+
+Heap::Node* Heap::search(Node* root, int current_depth, int depth){
+	if(current_depth == depth - 1 && root->right == 0)
+		return root;
+	if(current_depth >= depth - 1 && root->right != 0){
+		std::cout << "Returning zero at " << root->data << " Got a depth of: " << depth << " At depth of " << current_depth << std::endl; 
+		return 0;
+	}
+	Node* new_root = search(root->left, ++current_depth, depth);
+	if(new_root != 0)
+		return new_root;
+	return search(root->right, ++current_depth, depth);
+}
+
+//This function inserts a node at the next spot, from right to left, at the bottom of the tree. It uses insert_helper to insert the node 
+void Heap::insert(int data){
+	if(num_nodes == 0){ //Sets the root node's values if the tree is empty
+		root = new Node();
+		root->right = 0;
+		root->left = 0;
+		root->data = data;
+		num_nodes++;
+		std::cout << "Inserted " << data << " at 0" << std::endl;
+		return;
+	}
+	int width = 1, size = num_nodes, depth = 1; //Declare the width, which is the current width of the tree at that depth, the size, which is the size of the tree, and the depth, which should be the depth of the tree
+	while(size > width){ //When the width is greater than size, we're not at the bottom 
+		size -= width; //Decrease size as we go further down
+		width *= 2; //Calculate the total width of how many nodes should be at this depth when full
+		depth++; //Increases the depth each time we go down
+	}
+	if (size == 1) //It doesn't go through the loop
+		depth++;
+	
+	Node* insert_node = search(root, 1, depth);
+	if(insert_node == 0){
+		//std::cout << "Couldn't find a spot to insert" << std::endl;
+		return;
+	}
+	Node* new_node = new Node();
+	new_node->data = data;
+	new_node->left = 0;
+	new_node->right = 0;
+	if(insert_node->left == 0){
+		insert_node->left = new_node;
+		num_nodes++;
+		std::cout << "Inserted " << data << " to the left of " << insert_node->data << std::endl;
+		return;
+	}
+	if(insert_node->right == 0){
+		insert_node->right = new_node;
+		num_nodes++;
+		std::cout << "Inserted " << data << " to the right of " << insert_node->data << std::endl;
+		return;
+	}
+	delete new_node;
+	//std::cout << "Couldn't insert node" << std::endl;
+}
+//Returns to total size of the heap
+int Heap::size(){
+	return num_nodes;
+}
+//Returns the max value of the heap, on a max heap it's just the root node
+int Heap::find_max(){
+	return root->data;
+}
+
+
+
+
+
 
 /*
 	This function is a recursive helper function to the insert method. It inserts a new node from left to right at the max depth of the tree.
@@ -74,26 +124,32 @@ std::ostream& operator<<(std::ostream& os, Heap& heap){
 		if go left:
 			return true
 		return false
-*/
+
 bool Heap::insert_helper(int data, int current_depth, int insertion_depth, bool go_left, Node* root){
 	current_depth++; //Increment the current depth, so we know what depth we're at
-	if(current_depth >= (insertion_depth - 1)){ //If we're right above the depth to insert at, which is going to be the level above the bottom of the tree
+	std::cout << "Depth: " << current_depth << " got passed an insertion_depth of " << insertion_depth << " trying to insert: " << data << std::endl; 
+	if(current_depth >= insertion_depth - 1){ //If we're right above the depth to insert at, which is going to be the level above the bottom of the tree
 		//Create a new node and insert it if there are children available
-		if(!root->left){ 
+		if(root->left == 0){ 
 			Node* node = new Node();
 			node->data = data;
 			root->left = node;
+			node->right = 0;
+			node->left = 0;
+			std::cout << "Inserted " << data << " at " << current_depth << " on the left side" << std::endl;
 			return true;
-		}else if(!root->right){
+		}else if(root->right == 0){
 			Node* node = new Node();
 			node->data = data;
 			root->right = node;
+			node->right = 0;
+			node->left = 0;
+			std::cout << "Inserted " << data << " at " << current_depth << " on the right side" << std::endl;
 			return true;
 		}
 		//If it reaches this point, both children aren't null, meaning that we aren't going to insert here, and it returns false
 		return false;
-	}
-	if(go_left){ //If we want to go from the left of the tree to the right
+	} else if(go_left){ //If we want to go from the left of the tree to the right
 		if(insert_helper(data, ++current_depth, insertion_depth, go_left, root->left)) //If we inserted a node below this node, return true
 			return true; 
 		if(insert_helper(data, ++current_depth, insertion_depth, go_left, root->right)) //If we inserted a node below below this node, return true
@@ -107,36 +163,4 @@ bool Heap::insert_helper(int data, int current_depth, int insertion_depth, bool 
 		return false; //Return false if no nodes were inserted
 	}
 }
-
-//This function inserts a node at the next spot, from right to left, at the bottom of the tree. It uses insert_helper to insert the node 
-void Heap::insert(int data){
-	if(num_nodes == 0){ //Sets the root node's values if the tree is empty
-		root->data = data;
-		num_nodes++;
-		return;
-	}
-
-	bool go_left = true;
-	int width = 1, size = num_nodes, depth = 1; //Declare the width, which is the current width of the tree at that depth, the size, which is the size of the tree, and the depth, which should be the depth of the tree
-	while(size > width){ //When the width is greater than size, we're not at the bottom 
-		size -= width; //Decrease size as we go further down
-		width *= 2; //Calculate the total width of how many nodes should be at this depth when full
-		depth++; //Increases the depth each time we go down
-	}
-	if(size > width / 2)
-		go_left = false;
-	//When the above loop finishes, we'll have the width of the base of the tree and the total depth as well as knowing whether or not to go left
-	
-	if(insert_helper(data, 0, depth, go_left, root)) //Go insert the node using a recursive function that takes values from the loop 
-		num_nodes++;
-	else
-		std::cout << "Couldn't insert node" << std::endl;	
-}
-//Returns to total size of the heap
-int Heap::size(){
-	return num_nodes;
-}
-//Returns the max value of the heap, on a max heap it's just the root node
-int Heap::find_max(){
-	return root->data;
-}
+*/

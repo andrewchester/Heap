@@ -7,12 +7,11 @@ class Heap{
 		};
 
 		int num_nodes;
-		bool insert_helper(int data, int current_depth, int insertion_depth, bool go_left, Node* root);
-
 		void delete_node(Node*);
 		void sift_up(Node*);
 		void sift_down(Node*);
-		void print(Node* root, int pre_spaces, bool new_line, int depth);
+		void print(Node* root);
+		Node* search(Node* root, int current_depth, int depth);
 	public:
 		Heap();
 

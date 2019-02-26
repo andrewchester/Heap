@@ -24,7 +24,14 @@ void from_file(Heap* heap, const char* path){
 
 int main(){
 	Heap heap = Heap();
-	from_file(&heap, "./input.txt");
-	std::cout << heap << std::endl;
+	//from_file(&heap, "./input.txt");
+	heap.insert(97);
+	heap.insert(58);
+	heap.insert(71);
+	heap.insert(31);
+	heap.insert(84);
+	heap.insert(46);
+	heap.insert(85);
+	//std::cout << heap << std::endl;
 	return 0;
 }
