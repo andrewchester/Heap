@@ -11,14 +11,14 @@ class Heap{
 		void delete_node(Node*);
 		void sift_up(Node*);
 		void sift_down(Node*);
-		void balance(Node*);
+		void balance(Node*, bool);
 		void print_helper(Node* root, int current_depth, int target_depth);
 		Node* search(Node* root, int current_depth, int depth);
 	public:
 		Heap();
 		Node* root;
 
-		void insert(int data);
+		void insert(int data, bool print);
 		void remove(int data);
 
 		Heap* heapify(int*);

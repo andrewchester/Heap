@@ -12,7 +12,7 @@ void from_file(Heap* heap, const char* path){
 	int position = 0;
 	while(file.get(c)){
 		if(c == ' '){
-			heap->insert(atoi(token));
+			heap->insert(atoi(token), false);
 			position = 0;
 			for(int i = 0; i < sizeof(token); i++) token[i] = 0;
 		}else {
@@ -56,7 +56,7 @@ int main(){
 
 					if(strcmp(number, "exit") == 0)
 						break;
-					heap.insert(atoi(number));
+					heap.insert(atoi(number), true);
 				}
 				delete[] number;
 			}

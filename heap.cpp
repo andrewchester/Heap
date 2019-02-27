@@ -51,7 +51,7 @@ void Heap::print(bool tree_output){
 }
 
 //Balances the heap from one node all the way to the top, checking the immediate right of the parent
-void Heap::balance(Node* root){
+void Heap::balance(Node* root, bool print){
 	if(root == 0) //Just to make sure
 		return;
 	int root_data = root->data; //Set up temp variable for the root's data
@@ -61,7 +61,8 @@ void Heap::balance(Node* root){
 			// Swap the data if need be and output to logs 
 			root->left->data = root_data;
 			root->data = left_data;
-			std::cout << "Swapped the position of " << root_data << " and " << left_data << std::endl;
+			if(print)
+				std::cout << "Swapped the position of " << root_data << " and " << left_data << std::endl;
 		}
 	}
 	if(root->right != 0){
@@ -70,11 +71,12 @@ void Heap::balance(Node* root){
 			// Swap data if need be an output to logs
 			root->right->data = root_data;
 			root->data = right_data;
-			std::cout << "Swapped the position of " << root_data << " and " << right_data << std::endl;
+			if(print)
+				std::cout << "Swapped the position of " << root_data << " and " << right_data << std::endl;
 		} 
 	}
 	if(root->parent != 0) //Call the same function on the parent if it isn't the top of the list
-		balance(root->parent);
+		balance(root->parent, print);
 }
 
 //Searches the heap for a spot to insert, from left to right, and then returns the node above the place where the new node will be inserted
@@ -93,7 +95,7 @@ Heap::Node* Heap::search(Node* root, int current_depth, int depth){ //Takes the 
 }
 
 //This function inserts a node at the next spot, from right to left, at the bottom of the tree. It uses insert_helper to insert the node 
-void Heap::insert(int data){
+void Heap::insert(int data, bool print){ //Determines whether or not we should print logs
 	if(num_nodes == 0){ //Sets the root node's values if the tree is empty
 		root = new Node();
 		root->right = 0;
@@ -114,7 +116,8 @@ void Heap::insert(int data){
 	
 	Node* insert_node = search(root, 1, depth); //Get the node above where we want to insert
 	if(insert_node == 0){ 
-		std::cout << "Couldn't find a spot to insert" << std::endl;
+		if(print)
+			std::cout << "Couldn't find a spot to insert" << std::endl;
 		return;
 	}
 	//Create a new node with the data to insert
@@ -126,19 +129,22 @@ void Heap::insert(int data){
 	if(insert_node->left == 0){ //If the left side is open, insert there
 		insert_node->left = new_node;
 		num_nodes++;
-		std::cout << "Inserted " << data << " to the left of " << insert_node->data << std::endl;
-		balance(insert_node);
+		if(print)
+			std::cout << "Inserted " << data << " to the left of " << insert_node->data << std::endl;
+		balance(insert_node, print);
 		return;
 	}
 	if(insert_node->right == 0){ //If the right side is open, insert there after checking the left
 		insert_node->right = new_node;
 		num_nodes++;
-		std::cout << "Inserted " << data << " to the right of " << insert_node->data << std::endl;
-		balance(insert_node);
+		if(print)
+			std::cout << "Inserted " << data << " to the right of " << insert_node->data << std::endl;
+		balance(insert_node, print);
 		return;
 	}
 	delete new_node; //This means we couldn't insert it so we just delete the node
-	std::cout << "Couldn't insert node" << std::endl;
+	if(print)
+		std::cout << "Couldn't insert node" << std::endl;
 }
 //Returns to total size of the heap
 int Heap::size(){
