@@ -3,6 +3,7 @@ class Heap{
 		struct Node {
 			Node* left;
 			Node* right;
+			Node* parent;
 			int data;
 		};
 
@@ -10,14 +11,12 @@ class Heap{
 		void delete_node(Node*);
 		void sift_up(Node*);
 		void sift_down(Node*);
-		void print(Node* root);
+		void balance(Node*);
+		void print_helper(Node* root, int current_depth, int target_depth);
 		Node* search(Node* root, int current_depth, int depth);
 	public:
 		Heap();
-
 		Node* root;
-
-		friend std::ostream& operator<<(std::ostream& os, Heap& list); //Printing out the heap using << 
 
 		void insert(int data);
 		void remove(int data);
@@ -29,4 +28,6 @@ class Heap{
 		int find_max();
 		int size();
 		bool is_empty();
+
+		void print(bool);
 };
