@@ -4,29 +4,31 @@
 #include <fstream>
 #include "heap.h"
 
+//Gets integers from a file
+//Format: 1 2 3 4 
 void from_file(Heap* heap, const char* path){
 	std::ifstream file(path);
-	char c;
-	char token[100];
-	for(int i = 0; i < sizeof(token); i++) token[i] = 0;
-	int position = 0;
+	char c; //Holds the current character being read
+	char token[100]; //Characters are added to a token
+	for(int i = 0; i < sizeof(token); i++) token[i] = 0; //Reset token's values
+	int position = 0; //Track the position inside of token to add
 	while(file.get(c)){
-		if(c == ' '){
-			heap->insert(atoi(token), false);
-			position = 0;
-			for(int i = 0; i < sizeof(token); i++) token[i] = 0;
-		}else {
-			token[position] = c;
-			position++;
+		if(c == ' '){ //If we get a space
+			heap->insert(atoi(token), false); //Add token to the heap
+			position = 0; //Reset the position in token
+			for(int i = 0; i < sizeof(token); i++) token[i] = 0; //And reset token to all zeros
+		}else { //If another character
+			token[position] = c;//Add it to token
+			position++; //Increment position
 		}
 	}
 }
 
 int main(){
 	Heap heap = Heap();
-	char* input = new char[10];
+	char* input = new char[10]; //Holds the input of the user
 	while(true){
-		std::cout << "Enter command(input, exit, print, output): ";
+		std::cout << "Enter command(input, exit, print, output, remove, size, max): ";
 		std::cin.get(input, 10);
 		std::cin.clear();
 		std::cin.ignore(100, '\n');
@@ -66,21 +68,21 @@ int main(){
 			heap.print(true);
 		}else if(strcmp(input, "output") == 0){
 			heap.print(false);
+		}else if(strcmp(input, "remove") == 0){
+			std::cout << "Enter number to remove: ";
+			std::cin.get(input, 100);
+			std::cin.clear();
+			std::cin.ignore(100, '\n');
+
+			heap.remove(atoi(input));
+		}else if(strcmp(input, "size") == 0){
+			std::cout << heap.size() << std::endl;
+		}else if(strcmp(input, "max") == 0){
+			std::cout << heap.find_max() << std::endl;
 		}else{
 			std::cout << "Not sure what that command is..." << std::endl;
 		}
 	}
 	delete[] input;
-	/*
-	//from_file(&heap, "./input.txt");
-	heap.insert(97);
-	heap.insert(58);
-	heap.insert(71);
-	heap.insert(31);
-	heap.insert(84);
-	heap.insert(46);
-	heap.insert(85);
-	//std::cout << heap << std::endl;
-	*/
 	return 0;
 }
